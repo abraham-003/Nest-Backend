@@ -4,7 +4,7 @@
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
     "esModuleInterop": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -20,6 +20,12 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+
+    /* 👇 REQUIRED for custom Express Request.user */
+    "typeRoots": ["./node_modules/@types", "./src/types"]
+  },
+
+  /* 👇 Make sure .d.ts files are included */
+  "include": ["src/**/*", "src/types/**/*.d.ts"]
 }

@@ -43,3 +43,15 @@ It allows users to create listings, search for items, communicate with buyers/se
 ```bash
 $ npm install
 ```
+
+# development
+
+$ npm run start
+
+# watch mode
+
+$ npm run start:dev
+
+# production mode
+
+$ npm run start:prod
