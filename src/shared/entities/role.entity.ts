@@ -1,10 +1,11 @@
 import { User } from 'src/modules/users/entities/user.entity';
+import { Permission } from './permission.entity';
 import {
   Column,
   Entity,
-  JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
+  JoinTable,
 } from 'typeorm';
 
 @Entity({ name: 'roles' })
@@ -15,7 +16,12 @@ export class Role {
   @Column({ unique: true })
   name: string;
 
-  @ManyToMany(() => User)
-  @JoinTable()
+  // Many-to-Many with Users (inverse side, no @JoinTable here)
+  @ManyToMany(() => User, (user) => user.roles)
   users: User[];
+
+  // Many-to-Many with Permissions (Role owns the table)
+  @ManyToMany(() => Permission, (permission) => permission.roles)
+  @JoinTable({ name: 'role_permissions' })
+  permissions: Permission[];
 }

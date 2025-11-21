@@ -1,26 +1,51 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+// permissions.guard.ts
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Request } from 'express';
+import { DataSource } from 'typeorm';
+import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    private dataSource: DataSource,
+  ) {}
 
-  canActivate(ctx: ExecutionContext): boolean {
-    const required = this.reflector.get<string[]>(
-      'permissions',
-      ctx.getHandler(),
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+      PERMISSIONS_KEY,
+      [context.getHandler(), context.getClass()],
     );
-    if (!required) return true;
+    if (!requiredPermissions) return true;
 
-    // FIX: Explicitly type the request to avoid `any`
-    const req = ctx.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest();
+    const user = request.user as { id: number };
 
-    // FIX: Explicitly type the user
-    const user = req.user as { permissions?: string[] } | undefined;
+    if (!user) return false;
 
-    const userPermissions = user?.permissions ?? [];
+    // Fetch user's roles with permissions
+    const userWithRoles = await this.dataSource.getRepository(User).findOne({
+      where: { id: user.id },
+      relations: ['roles', 'roles.permissions'],
+    });
 
-    return required.some((p) => userPermissions.includes(p));
+    if (!userWithRoles) return false;
+
+    const userPermissions = userWithRoles.roles
+      .flatMap((role) => role.permissions)
+      .map((permission) => permission.name);
+
+    const hasPermission = requiredPermissions.some((p) =>
+      userPermissions.includes(p),
+    );
+    if (!hasPermission) throw new ForbiddenException('Access denied');
+
+    return true;
   }
 }

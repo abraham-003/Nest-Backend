@@ -34,18 +34,13 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() dto: RegisterDto) {
-    try {
-      const result = await this.auth.register(dto);
+    const result = await this.auth.register(dto);
 
-      return {
-        success: true,
-        message: 'User registered successfully',
-        data: result,
-      };
-    } catch (error) {
-      // Re-throw the error to let NestJS handle it
-      throw error;
-    }
+    return {
+      success: true,
+      message: 'User registered successfully',
+      data: result,
+    };
   }
 
   /**
@@ -56,17 +51,13 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto) {
-    try {
-      const result = await this.auth.login(dto);
+    const result = await this.auth.login(dto);
 
-      return {
-        success: true,
-        message: 'Login successful',
-        data: result,
-      };
-    } catch (error) {
-      throw error;
-    }
+    return {
+      success: true,
+      message: 'Login successful',
+      data: result,
+    };
   }
 
   /**
@@ -78,18 +69,14 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Req() req: AuthRequest) {
-    try {
-      const { sub, refreshToken } = req.user;
-      const result = await this.auth.refresh(sub, refreshToken ?? '');
+    const { sub, refreshToken } = req.user;
+    const result = await this.auth.refresh(sub, refreshToken ?? '');
 
-      return {
-        success: true,
-        message: 'Tokens refreshed successfully',
-        data: result,
-      };
-    } catch (error) {
-      throw error;
-    }
+    return {
+      success: true,
+      message: 'Tokens refreshed successfully',
+      data: result,
+    };
   }
 
   /**
@@ -102,20 +89,16 @@ export class AuthController {
   @UseGuards(RefreshGuard)
   @HttpCode(HttpStatus.OK)
   async logout(@Req() req: AuthRequest) {
-    try {
-      const { sub, refreshToken } = req.user;
+    const { sub, refreshToken } = req.user;
 
-      // Use the specific refresh token for logout
-      await this.auth.logout(sub, refreshToken ?? '');
+    // Use the specific refresh token for logout
+    await this.auth.logout(sub, refreshToken ?? '');
 
-      return {
-        success: true,
-        message: 'Logged out successfully',
-        data: null,
-      };
-    } catch (error) {
-      throw error;
-    }
+    return {
+      success: true,
+      message: 'Logged out successfully',
+      data: null,
+    };
   }
 
   /**
@@ -127,18 +110,14 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async logoutAll(@Req() req: AuthRequest) {
-    try {
-      const userId = req.user.sub;
-      await this.auth.logoutAll(userId);
+    const userId = req.user.sub;
+    await this.auth.logoutAll(userId);
 
-      return {
-        success: true,
-        message: 'Logged out from all devices successfully',
-        data: null,
-      };
-    } catch (error) {
-      throw error;
-    }
+    return {
+      success: true,
+      message: 'Logged out from all devices successfully',
+      data: null,
+    };
   }
 
   /**
@@ -149,7 +128,7 @@ export class AuthController {
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async getProfile(@Req() req: AuthRequest) {
+  getProfile(@Req() req: AuthRequest) {
     return {
       success: true,
       message: 'Profile retrieved successfully',
@@ -167,7 +146,7 @@ export class AuthController {
   @Get('validate')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async validateToken(@Req() req: AuthRequest) {
+  validateToken(@Req() req: AuthRequest) {
     return {
       success: true,
       message: 'Token is valid',
@@ -184,7 +163,7 @@ export class AuthController {
    */
   @Get('health')
   @HttpCode(HttpStatus.OK)
-  async healthCheck() {
+  healthCheck() {
     return {
       success: true,
       message: 'Authentication service is running',

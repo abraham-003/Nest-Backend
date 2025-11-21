@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 
 import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './config/database.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { DatabaseModule } from './config/database.module';
 
     // Database connection via Sequelize + PostgreSQL
     DatabaseModule,
+    AuthModule,
 
     UsersModule,
 
